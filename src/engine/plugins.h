@@ -7,12 +7,29 @@
 
 #define PLUGIN_EXPORT extern "C"
 
+#define PLUGIN_INFO_NAME "PluginInfo"
+#define PLUGIN_INIT_NAME "PluginInit"
+#define PLUGIN_DESTROY_NAME "PluginDestroy"
+
 #define PLUGIN_INIT_SIGNATURE void (IKernel *, IPlugin *)
 #define PLUGIN_DESTROY_SIGNATURE void (IKernel *, IPlugin *)
+
+#define PLUGIN_INFO(Name, Version, Author, Description)\
+	CPluginInfo PluginInfo = {Name, Version, Author, Description};
+
+struct CPluginInfo
+{
+	const char *m_Name;
+	const char *m_Version;
+	const char *m_Author;
+	const char *m_Description;
+};
 
 class IPlugin
 {
 public:
+	CPluginInfo m_PluginInfo;
+
 	virtual ~IPlugin() {};
 
 	virtual void *GetSymbol(const char *pSymName) = 0;

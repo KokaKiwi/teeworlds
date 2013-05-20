@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <dlfcn.h>
 
+#include <base/system.h>
 #include <base/tl/array.h>
 
 #include <engine/plugins.h>
@@ -55,10 +56,28 @@ IPlugin *CPlugins::LoadPlugin(const char *pPath)
 		return 0;
 	}
 
-	if (pPlugin->Get<PLUGIN_INIT_SIGNATURE>("PluginInit"))
-		pPlugin->Get<PLUGIN_INIT_SIGNATURE>("PluginInit")(Kernel(), pPlugin);
+	if (pPlugin->Get<CPluginInfo>(PLUGIN_INFO_NAME))
+		mem_copy(&pPlugin->m_PluginInfo, pPlugin->Get<CPluginInfo>(PLUGIN_INFO_NAME), sizeof(CPluginInfo));
 	else if(pPlugin->Error())
-		dbg_msg("plugins", "Plugin init error: %s", pPlugin->ErrorString());
+	{
+		dbg_msg("plugins", "%s", pPlugin->ErrorString());
+		delete pPlugin;
+		return 0;
+	}
+
+	if (pPlugin->Get<PLUGIN_INIT_SIGNATURE>(PLUGIN_INIT_NAME))
+		pPlugin->Get<PLUGIN_INIT_SIGNATURE>(PLUGIN_INIT_NAME)(Kernel(), pPlugin);
+	else if(pPlugin->Error())
+	{
+		dbg_msg("plugins", "%s", pPlugin->ErrorString());
+		delete pPlugin;
+		return 0;
+	}
+
+	dbg_msg("plugins", "Loaded plugin: %s v%s by %s",
+	        pPlugin->m_PluginInfo.m_Name,
+	        pPlugin->m_PluginInfo.m_Version,
+	        pPlugin->m_PluginInfo.m_Author);
 
 	m_pPlugins.add(pPlugin);
 
@@ -67,8 +86,10 @@ IPlugin *CPlugins::LoadPlugin(const char *pPath)
 
 void CPlugins::UnloadPlugin(IPlugin *pPlugin)
 {
-	if (pPlugin->Get<PLUGIN_DESTROY_SIGNATURE>("PluginDestroy"))
-		pPlugin->Get<PLUGIN_DESTROY_SIGNATURE>("PluginDestroy")(Kernel(), pPlugin);
+	if (pPlugin->Get<PLUGIN_DESTROY_SIGNATURE>(PLUGIN_DESTROY_NAME))
+		pPlugin->Get<PLUGIN_DESTROY_SIGNATURE>(PLUGIN_DESTROY_NAME)(Kernel(), pPlugin);
+	else if(pPlugin->Error())
+		dbg_msg("plugins", "%s", pPlugin->ErrorString());
 
 	delete pPlugin;
 }
