@@ -766,7 +766,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		if(pMsg->m_Silent == 0)
 		{
 			DoTeamChangeMessage(m_aClients[pMsg->m_ClientID].m_aName, pMsg->m_Team);
-		}		
+		}
 	}
 	else if(MsgId == NETMSGTYPE_SV_READYTOENTER)
 	{

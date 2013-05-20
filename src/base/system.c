@@ -1560,6 +1560,14 @@ void str_copy(char *dst, const char *src, int dst_size)
 	dst[dst_size-1] = 0; /* assure null termination */
 }
 
+char *str_dup(const char *src)
+{
+	int length = str_length(src);
+	char *copy = mem_alloc(length + 1, 4);
+	str_copy(copy, src, length + 1);
+	return copy;
+}
+
 int str_length(const char *str)
 {
 	return (int)strlen(str);

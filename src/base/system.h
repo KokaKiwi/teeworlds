@@ -748,6 +748,18 @@ void str_append(char *dst, const char *src, int dst_size);
 void str_copy(char *dst, const char *src, int dst_size);
 
 /*
+	Function: str_dup
+		Returns an allocated copy of a zero terminated string.
+
+	Parameters:
+		src - Pointer to the string.
+
+	Returns:
+		An allocated copy of the string.
+*/
+char *str_dup(const char *src);
+
+/*
 	Function: str_length
 		Returns the length of a zero terminated string.
 

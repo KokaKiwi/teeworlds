@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(teeworlds)
 
-# set(OFLAGS "-ggdb3")
-set(OFLAGS "-march=native -msse -msse2 -msse3 -mmmx")
+set(OFLAGS "-ggdb3")
+# set(OFLAGS "-march=native -msse -msse2 -msse3 -mmmx")
 
 set(CMAKE_C_FLAGS "${OFLAGS} -Wall -fno-exceptions")
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
@@ -96,6 +96,7 @@ file(GLOB teeworlds_engine_SOURCES src/engine/shared/*.cpp src/base/*.c)
 
 file(GLOB teeworlds_client_SOURCES src/engine/client/*.cpp)
 file(GLOB teeworlds_server_SOURCES src/engine/server/*.cpp)
+file(GLOB teeworlds_bot_SOURCES src/engine/bot/*.cpp)
 
 file(GLOB teeworlds_versionserver_SOURCES src/versionsrv/*.cpp)
 file(GLOB teeworlds_masterserver_SOURCES src/mastersrv/*.cpp)
@@ -106,6 +107,9 @@ list(APPEND teeworlds_game_shared_SOURCES ${network_SOURCE})
 
 file(GLOB_RECURSE teeworlds_game_client_SOURCES src/game/client/*.cpp)
 list(APPEND teeworlds_game_client_SOURCES ${client_content_SOURCE})
+
+file(GLOB_RECURSE teeworlds_game_bot_SOURCES src/game/bot/*.cpp)
+list(APPEND teeworlds_game_bot_SOURCES ${client_content_SOURCE})
 
 file(GLOB_RECURSE teeworlds_game_server_SOURCES src/game/server/*.cpp)
 list(APPEND teeworlds_game_server_SOURCES ${server_content_SOURCE})
@@ -136,6 +140,13 @@ add_executable(teeworlds_srv
     ${teeworlds_game_server_SOURCES}
 )
 
+add_executable(teeworlds_bot
+    ${teeworlds_game_shared_SOURCES}
+    ${teeworlds_game_bot_SOURCES}
+    ${teeworlds_engine_SOURCES}
+    ${teeworlds_bot_SOURCES}
+)
+
 add_executable(versionsrv
     ${teeworlds_versionserver_SOURCES}
     ${CMAKE_CURRENT_BINARY_DIR}/game/generated/nethash.cpp
@@ -150,6 +161,7 @@ add_executable(mastersrv
 
 target_link_libraries(teeworlds z)
 target_link_libraries(teeworlds_srv z)
+target_link_libraries(teeworlds_bot z)
 target_link_libraries(versionsrv z)
 target_link_libraries(mastersrv z)
 
@@ -162,6 +174,7 @@ target_link_libraries(teeworlds
 
 target_link_libraries(teeworlds pthread)
 target_link_libraries(teeworlds_srv pthread)
+target_link_libraries(teeworlds_bot pthread)
 target_link_libraries(versionsrv pthread)
 target_link_libraries(mastersrv pthread)
 
