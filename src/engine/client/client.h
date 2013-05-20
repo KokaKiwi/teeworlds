@@ -65,6 +65,7 @@ class CClient : public IClient, public CDemoPlayer::IListner
 	IStorage *m_pStorage;
 	IEngineMasterServer *m_pMasterServer;
 	IPlugins *m_pPlugins;
+	IEvents *m_pEvents;
 
 	enum
 	{
@@ -195,6 +196,7 @@ public:
 	IEngineMasterServer *MasterServer() { return m_pMasterServer; }
 	IStorage *Storage() { return m_pStorage; }
 	IPlugins *Plugins() { return m_pPlugins; }
+	IEvents *Events() { return m_pEvents; }
 
 	CClient();
 

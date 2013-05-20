@@ -7,8 +7,8 @@
 
 #define PLUGIN_EXPORT extern "C"
 
-#define PLUGIN_INIT_SIGNATURE void (IKernel *, IPlugins *, IPlugin *)
-#define PLUGIN_DESTROY_SIGNATURE void (IPlugins *, IPlugin *)
+#define PLUGIN_INIT_SIGNATURE void (IKernel *, IPlugin *)
+#define PLUGIN_DESTROY_SIGNATURE void (IKernel *, IPlugin *)
 
 class IPlugin
 {

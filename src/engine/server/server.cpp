@@ -7,8 +7,10 @@
 #include <engine/config.h>
 #include <engine/console.h>
 #include <engine/engine.h>
+#include <engine/events.h>
 #include <engine/map.h>
 #include <engine/masterserver.h>
+#include <engine/plugins.h>
 #include <engine/server.h>
 #include <engine/storage.h>
 
@@ -1527,6 +1529,13 @@ void CServer::ConLogout(IConsole::IResult *pResult, void *pUser)
 	}
 }
 
+void CServer::ConLoadPlugin(IConsole::IResult *pResult, void *pUser)
+{
+	CServer *pServer = (CServer *)pUser;
+
+	pServer->m_pPlugins->LoadPlugin(pResult->GetString(0));
+}
+
 void CServer::ConchainSpecialInfoupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
 {
 	pfnCallback(pResult, pCallbackUserData);
@@ -1586,6 +1595,8 @@ void CServer::RegisterCommands()
 	m_pGameServer = Kernel()->RequestInterface<IGameServer>();
 	m_pMap = Kernel()->RequestInterface<IEngineMap>();
 	m_pStorage = Kernel()->RequestInterface<IStorage>();
+	m_pPlugins = Kernel()->RequestInterface<IPlugins>();
+	m_pEvents = Kernel()->RequestInterface<IEvents>();
 
 	// register console commands
 	Console()->Register("kick", "i?r", CFGFLAG_SERVER, ConKick, this, "Kick player with specified id for any reason");
@@ -1597,6 +1608,8 @@ void CServer::RegisterCommands()
 	Console()->Register("stoprecord", "", CFGFLAG_SERVER, ConStopRecord, this, "Stop recording");
 
 	Console()->Register("reload", "", CFGFLAG_SERVER, ConMapReload, this, "Reload the map");
+
+	Console()->Register("loadplugin", "s", CFGFLAG_SERVER, ConLoadPlugin, this, "Load plugin");
 
 	Console()->Chain("sv_name", ConchainSpecialInfoupdate, this);
 	Console()->Chain("password", ConchainSpecialInfoupdate, this);
@@ -1660,6 +1673,8 @@ int main(int argc, const char **argv) // ignore_convention
 	IEngineMasterServer *pEngineMasterServer = CreateEngineMasterServer();
 	IStorage *pStorage = CreateStorage("Teeworlds", IStorage::STORAGETYPE_SERVER, argc, argv); // ignore_convention
 	IConfig *pConfig = CreateConfig();
+	IPlugins *pPlugins = CreatePlugins();
+	IEvents *pEvents = CreateEvents();
 
 	pServer->InitRegister(&pServer->m_NetServer, pEngineMasterServer, pConsole);
 
@@ -1674,6 +1689,8 @@ int main(int argc, const char **argv) // ignore_convention
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConsole);
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pStorage);
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConfig);
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pPlugins);
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pEvents);
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IEngineMasterServer*>(pEngineMasterServer)); // register as both
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IMasterServer*>(pEngineMasterServer));
 
@@ -1683,6 +1700,8 @@ int main(int argc, const char **argv) // ignore_convention
 
 	pEngine->Init();
 	pConfig->Init();
+	pPlugins->Init();
+	pEvents->Init();
 	pEngineMasterServer->Init();
 	pEngineMasterServer->Load();
 
@@ -1715,6 +1734,7 @@ int main(int argc, const char **argv) // ignore_convention
 	delete pEngineMasterServer;
 	delete pStorage;
 	delete pConfig;
+	delete pPlugins;
 
 	return 0;
 }

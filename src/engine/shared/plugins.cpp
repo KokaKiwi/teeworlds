@@ -56,7 +56,7 @@ IPlugin *CPlugins::LoadPlugin(const char *pPath)
 	}
 
 	if (pPlugin->Get<PLUGIN_INIT_SIGNATURE>("PluginInit"))
-		pPlugin->Get<PLUGIN_INIT_SIGNATURE>("PluginInit")(Kernel(), this, pPlugin);
+		pPlugin->Get<PLUGIN_INIT_SIGNATURE>("PluginInit")(Kernel(), pPlugin);
 	else if(pPlugin->Error())
 		dbg_msg("plugins", "Plugin init error: %s", pPlugin->ErrorString());
 
@@ -68,7 +68,7 @@ IPlugin *CPlugins::LoadPlugin(const char *pPath)
 void CPlugins::UnloadPlugin(IPlugin *pPlugin)
 {
 	if (pPlugin->Get<PLUGIN_DESTROY_SIGNATURE>("PluginDestroy"))
-		pPlugin->Get<PLUGIN_DESTROY_SIGNATURE>("PluginDestroy")(this, pPlugin);
+		pPlugin->Get<PLUGIN_DESTROY_SIGNATURE>("PluginDestroy")(Kernel(), pPlugin);
 
 	delete pPlugin;
 }
@@ -84,12 +84,12 @@ void CPlugins::UnloadPlugins()
 	}
 }
 
-IPlugins *CreatePlugins()
-{
-	return new CPlugins();
-}
-
 void CPlugins::Init()
 {
 
+}
+
+IPlugins *CreatePlugins()
+{
+	return new CPlugins();
 }

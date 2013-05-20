@@ -28,6 +28,7 @@ class CPlugins : public IPlugins
 	array<CPlugin *> m_pPlugins;
 
 public:
+
 	virtual IPlugin *LoadPlugin(const char *pPath);
 	virtual void UnloadPlugin(IPlugin *pPlugin);
 	virtual void UnloadPlugins();

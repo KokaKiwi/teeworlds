@@ -13,6 +13,7 @@
 #include <engine/console.h>
 #include <engine/editor.h>
 #include <engine/engine.h>
+#include <engine/events.h>
 #include <engine/graphics.h>
 #include <engine/input.h>
 #include <engine/keys.h>
@@ -1703,6 +1704,7 @@ void CClient::InitInterfaces()
 	m_pMasterServer = Kernel()->RequestInterface<IEngineMasterServer>();
 	m_pStorage = Kernel()->RequestInterface<IStorage>();
 	m_pPlugins = Kernel()->RequestInterface<IPlugins>();
+	m_pEvents = Kernel()->RequestInterface<IEvents>();
 
 	//
 	m_ServerBrowser.SetBaseInfo(&m_NetClient, m_pGameClient->NetVersion());
@@ -2284,6 +2286,7 @@ int main(int argc, const char **argv) // ignore_convention
 	IEngineMap *pEngineMap = CreateEngineMap();
 	IEngineMasterServer *pEngineMasterServer = CreateEngineMasterServer();
 	IPlugins *pPlugins = CreatePlugins();
+	IEvents *pEvents = CreateEvents();
 
 	{
 		bool RegisterFail = false;
@@ -2308,6 +2311,7 @@ int main(int argc, const char **argv) // ignore_convention
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IMasterServer*>(pEngineMasterServer));
 
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pPlugins);
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pEvents);
 
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(CreateEditor());
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(CreateGameClient());
@@ -2319,6 +2323,8 @@ int main(int argc, const char **argv) // ignore_convention
 
 	pEngine->Init();
 	pConfig->Init();
+	pPlugins->Init();
+	pEvents->Init();
 	pEngineMasterServer->Init();
 	pEngineMasterServer->Load();
 
