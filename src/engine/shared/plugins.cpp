@@ -55,8 +55,8 @@ IPlugin *CPlugins::LoadPlugin(const char *pPath)
 		return 0;
 	}
 
-	if (pPlugin->Get<void (IKernel *, IPlugin *)>("PluginInit"))
-		pPlugin->Get<void (IKernel *, IPlugin *)>("PluginInit")(Kernel(), pPlugin);
+	if (pPlugin->Get<PLUGIN_INIT_SIGNATURE>("PluginInit"))
+		pPlugin->Get<PLUGIN_INIT_SIGNATURE>("PluginInit")(Kernel(), this, pPlugin);
 	else if(pPlugin->Error())
 		dbg_msg("plugins", "Plugin init error: %s", pPlugin->ErrorString());
 
@@ -67,8 +67,8 @@ IPlugin *CPlugins::LoadPlugin(const char *pPath)
 
 void CPlugins::UnloadPlugin(IPlugin *pPlugin)
 {
-	if (pPlugin->Get<void (IPlugin *)>("PluginDestroy"))
-		pPlugin->Get<void (IPlugin *)>("PluginDestroy")(pPlugin);
+	if (pPlugin->Get<PLUGIN_DESTROY_SIGNATURE>("PluginDestroy"))
+		pPlugin->Get<PLUGIN_DESTROY_SIGNATURE>("PluginDestroy")(this, pPlugin);
 
 	delete pPlugin;
 }
