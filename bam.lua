@@ -146,7 +146,8 @@ function build(settings)
 	if config.compiler.driver == "cl" then
 		settings.cc.flags:Add("/wd4244")
 	else
-		settings.cc.flags:Add("-Wall", "-fno-exceptions")
+		settings.cc.flags:Add("-Wall", "-fno-exceptions", "-fPIC")
+		settings.link.flags:Add("-Wl,-export-dynamic")
 		if family == "windows" then
 			-- disable visibility attribute support for gcc on windows
 			settings.cc.defines:Add("NO_VIZ")
@@ -197,6 +198,8 @@ function build(settings)
 		zlib = Compile(settings, Collect("src/engine/external/zlib/*.c"))
 		settings.cc.includes:Add("src/engine/external/zlib")
 	end
+
+	settings.link.libs:Add("dl")
 
 	-- build the small libraries
 	wavpack = Compile(settings, Collect("src/engine/external/wavpack/*.c"))

@@ -64,6 +64,7 @@ class CClient : public IClient, public CDemoPlayer::IListner
 	IConsole *m_pConsole;
 	IStorage *m_pStorage;
 	IEngineMasterServer *m_pMasterServer;
+	IPlugins *m_pPlugins;
 
 	enum
 	{
@@ -193,6 +194,7 @@ public:
 	IGameClient *GameClient() { return m_pGameClient; }
 	IEngineMasterServer *MasterServer() { return m_pMasterServer; }
 	IStorage *Storage() { return m_pStorage; }
+	IPlugins *Plugins() { return m_pPlugins; }
 
 	CClient();
 
@@ -272,6 +274,8 @@ public:
 	virtual void OnDemoPlayerSnapshot(void *pData, int Size);
 	virtual void OnDemoPlayerMessage(void *pData, int Size);
 
+	void LoadPlugin(const char *pPath);
+
 	void Update();
 
 	void RegisterInterfaces();
@@ -294,6 +298,7 @@ public:
 	static void Con_Record(IConsole::IResult *pResult, void *pUserData);
 	static void Con_StopRecord(IConsole::IResult *pResult, void *pUserData);
 	static void Con_AddDemoMarker(IConsole::IResult *pResult, void *pUserData);
+	static void Con_LoadPlugin(IConsole::IResult *pResult, void *pUserData);
 	static void ConchainServerBrowserUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 
 	void RegisterCommands();

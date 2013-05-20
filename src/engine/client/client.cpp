@@ -18,6 +18,7 @@
 #include <engine/keys.h>
 #include <engine/map.h>
 #include <engine/masterserver.h>
+#include <engine/plugins.h>
 #include <engine/serverbrowser.h>
 #include <engine/sound.h>
 #include <engine/storage.h>
@@ -1474,6 +1475,11 @@ void CClient::OnDemoPlayerMessage(void *pData, int Size)
 	if(!Sys)
 		GameClient()->OnMessage(Msg, &Unpacker);
 }
+
+void CClient::LoadPlugin(const char *pPath)
+{
+	m_pPlugins->LoadPlugin(pPath);
+}
 /*
 const IDemoPlayer::CInfo *client_demoplayer_getinfo()
 {
@@ -1696,6 +1702,7 @@ void CClient::InitInterfaces()
 	m_pMap = Kernel()->RequestInterface<IEngineMap>();
 	m_pMasterServer = Kernel()->RequestInterface<IEngineMasterServer>();
 	m_pStorage = Kernel()->RequestInterface<IStorage>();
+	m_pPlugins = Kernel()->RequestInterface<IPlugins>();
 
 	//
 	m_ServerBrowser.SetBaseInfo(&m_NetClient, m_pGameClient->NetVersion());
@@ -1969,6 +1976,7 @@ void CClient::Run()
 
 	m_pGraphics->Shutdown();
 	m_pSound->Shutdown();
+	m_pPlugins->UnloadPlugins();
 
 	// shutdown SDL
 	{
@@ -2179,6 +2187,12 @@ void CClient::Con_AddDemoMarker(IConsole::IResult *pResult, void *pUserData)
 	pSelf->DemoRecorder_AddDemoMarker();
 }
 
+void CClient::Con_LoadPlugin(IConsole::IResult *pResult, void *pUserData)
+{
+	CClient *pSelf = (CClient *)pUserData;
+	pSelf->LoadPlugin(pResult->GetString(0));
+}
+
 void CClient::ServerBrowserUpdate()
 {
 	m_ResortServerBrowser = true;
@@ -2208,6 +2222,7 @@ void CClient::RegisterCommands()
 	m_pConsole->Register("record", "?s", CFGFLAG_CLIENT, Con_Record, this, "Record to the file");
 	m_pConsole->Register("stoprecord", "", CFGFLAG_CLIENT, Con_StopRecord, this, "Stop recording");
 	m_pConsole->Register("add_demomarker", "", CFGFLAG_CLIENT, Con_AddDemoMarker, this, "Add demo timeline marker");
+	m_pConsole->Register("loadplugin", "s", CFGFLAG_CLIENT, Con_LoadPlugin, this, "Load plugin");
 
 	// used for server browser update
 	m_pConsole->Chain("br_filter_string", ConchainServerBrowserUpdate, this);
@@ -2268,6 +2283,7 @@ int main(int argc, const char **argv) // ignore_convention
 	IEngineTextRender *pEngineTextRender = CreateEngineTextRender();
 	IEngineMap *pEngineMap = CreateEngineMap();
 	IEngineMasterServer *pEngineMasterServer = CreateEngineMasterServer();
+	IPlugins *pPlugins = CreatePlugins();
 
 	{
 		bool RegisterFail = false;
@@ -2290,6 +2306,8 @@ int main(int argc, const char **argv) // ignore_convention
 
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IEngineMasterServer*>(pEngineMasterServer)); // register as both
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IMasterServer*>(pEngineMasterServer));
+
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pPlugins);
 
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(CreateEditor());
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(CreateGameClient());
