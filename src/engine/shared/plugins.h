@@ -29,7 +29,7 @@ class CPlugins : public IPlugins
 
 public:
 
-	virtual IPlugin *LoadPlugin(const char *pPath);
+	virtual IPlugin *LoadPlugin(const char *pPath, int Type);
 	virtual void UnloadPlugin(IPlugin *pPlugin);
 	virtual void UnloadPlugins();
 

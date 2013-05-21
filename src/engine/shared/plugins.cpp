@@ -45,7 +45,7 @@ const char *CPlugin::ErrorString()
 	return m_pError;
 }
 
-IPlugin *CPlugins::LoadPlugin(const char *pPath)
+IPlugin *CPlugins::LoadPlugin(const char *pPath, int Type)
 {
 	CPlugin *pPlugin = new CPlugin(pPath);
 
@@ -61,6 +61,13 @@ IPlugin *CPlugins::LoadPlugin(const char *pPath)
 	else if(pPlugin->Error())
 	{
 		dbg_msg("plugins", "%s", pPlugin->ErrorString());
+		delete pPlugin;
+		return 0;
+	}
+
+	if (!(pPlugin->m_PluginInfo.m_Type & Type))
+	{
+		dbg_msg("plugins", "error: mismatching plugin type: %s", pPath);
 		delete pPlugin;
 		return 0;
 	}

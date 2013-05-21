@@ -250,6 +250,8 @@ function build(settings)
 	-- build tools (TODO: fix this so we don't get double _d_d stuff)
 	tools_src = Collect("src/tools/*.cpp", "src/tools/*.c")
 
+	plugins_dir = CollectDirs("plugins/*")
+
 	client_osxlaunch = {}
 	server_osxlaunch = {}
 	if platform == "macosx" then
@@ -261,6 +263,17 @@ function build(settings)
 	for i,v in ipairs(tools_src) do
 		toolname = PathFilename(PathBase(v))
 		tools[i] = Link(settings, toolname, Compile(settings, v), engine, zlib, pnglite)
+	end
+
+	plugins_settings = settings:Copy()
+	plugins_settings.cc.flags:Add("-fPIC")
+
+	plugins = {}
+	for i,v in ipairs(plugins_dir) do
+		pluginname = PathFilename(PathBase(v))
+		plugin_src = CollectRecursive(v .. "/*")
+		pluginfile = "plugins/" .. pluginname .. ".so"
+		plugins[i] = SharedLibrary(plugins_settings, pluginfile, Compile(plugins_settings, plugin_src))
 	end
 
 	-- build client, server, version server and master server
@@ -290,8 +303,9 @@ function build(settings)
 	v = PseudoTarget("versionserver".."_"..settings.config_name, versionserver_exe)
 	m = PseudoTarget("masterserver".."_"..settings.config_name, masterserver_exe)
 	t = PseudoTarget("tools".."_"..settings.config_name, tools)
+	p = PseudoTarget("plugins".."_"..settings.config_name, plugins)
 
-	all = PseudoTarget(settings.config_name, c, s, v, m, t)
+	all = PseudoTarget(settings.config_name, c, s, v, m, t, p)
 	return all
 end
 

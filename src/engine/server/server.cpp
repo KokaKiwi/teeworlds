@@ -1533,7 +1533,7 @@ void CServer::ConLoadPlugin(IConsole::IResult *pResult, void *pUser)
 {
 	CServer *pServer = (CServer *)pUser;
 
-	pServer->m_pPlugins->LoadPlugin(pResult->GetString(0));
+	pServer->m_pPlugins->LoadPlugin(pResult->GetString(0), PLUGIN_SERVER);
 }
 
 void CServer::ConchainSpecialInfoupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)

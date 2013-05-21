@@ -1479,7 +1479,7 @@ void CClient::OnDemoPlayerMessage(void *pData, int Size)
 
 void CClient::LoadPlugin(const char *pPath)
 {
-	m_pPlugins->LoadPlugin(pPath);
+	m_pPlugins->LoadPlugin(pPath, PLUGIN_CLIENT);
 }
 /*
 const IDemoPlayer::CInfo *client_demoplayer_getinfo()
