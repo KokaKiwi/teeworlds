@@ -1476,11 +1476,6 @@ void CClient::OnDemoPlayerMessage(void *pData, int Size)
 	if(!Sys)
 		GameClient()->OnMessage(Msg, &Unpacker);
 }
-
-void CClient::LoadPlugin(const char *pPath)
-{
-	m_pPlugins->LoadPlugin(pPath, PLUGIN_CLIENT);
-}
 /*
 const IDemoPlayer::CInfo *client_demoplayer_getinfo()
 {
@@ -2189,12 +2184,6 @@ void CClient::Con_AddDemoMarker(IConsole::IResult *pResult, void *pUserData)
 	pSelf->DemoRecorder_AddDemoMarker();
 }
 
-void CClient::Con_LoadPlugin(IConsole::IResult *pResult, void *pUserData)
-{
-	CClient *pSelf = (CClient *)pUserData;
-	pSelf->LoadPlugin(pResult->GetString(0));
-}
-
 void CClient::ServerBrowserUpdate()
 {
 	m_ResortServerBrowser = true;
@@ -2224,7 +2213,6 @@ void CClient::RegisterCommands()
 	m_pConsole->Register("record", "?s", CFGFLAG_CLIENT, Con_Record, this, "Record to the file");
 	m_pConsole->Register("stoprecord", "", CFGFLAG_CLIENT, Con_StopRecord, this, "Stop recording");
 	m_pConsole->Register("add_demomarker", "", CFGFLAG_CLIENT, Con_AddDemoMarker, this, "Add demo timeline marker");
-	m_pConsole->Register("loadplugin", "s", CFGFLAG_CLIENT, Con_LoadPlugin, this, "Load plugin");
 
 	// used for server browser update
 	m_pConsole->Chain("br_filter_string", ConchainServerBrowserUpdate, this);
@@ -2285,7 +2273,7 @@ int main(int argc, const char **argv) // ignore_convention
 	IEngineTextRender *pEngineTextRender = CreateEngineTextRender();
 	IEngineMap *pEngineMap = CreateEngineMap();
 	IEngineMasterServer *pEngineMasterServer = CreateEngineMasterServer();
-	IPlugins *pPlugins = CreatePlugins();
+	IPlugins *pPlugins = CreatePlugins(PLUGIN_CLIENT);
 	IEvents *pEvents = CreateEvents();
 
 	{

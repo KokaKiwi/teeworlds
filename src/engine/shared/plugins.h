@@ -29,9 +29,13 @@ class CPlugins : public IPlugins
 
 public:
 
-	virtual IPlugin *LoadPlugin(const char *pPath, int Type);
+    CPlugins(int Type);
+
+	virtual IPlugin *LoadPlugin(const char *pPath);
 	virtual void UnloadPlugin(IPlugin *pPlugin);
 	virtual void UnloadPlugins();
+
+    static void Con_LoadPlugin(IConsole::IResult *pResult, void *pUserData);
 
 	virtual void Init();
 };

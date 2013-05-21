@@ -55,15 +55,20 @@ public:
 class IPlugins : public IInterface
 {
 	MACRO_INTERFACE("plugins", 0)
+
+protected:
+
+	int m_pType;
+
 public:
 
-	virtual IPlugin *LoadPlugin(const char *pPath, int Type) = 0;
+	virtual IPlugin *LoadPlugin(const char *pPath) = 0;
 	virtual void UnloadPlugin(IPlugin *pPlugin) = 0;
 	virtual void UnloadPlugins() = 0;
 
 	virtual void Init() = 0;
 };
 
-extern IPlugins *CreatePlugins();
+extern IPlugins *CreatePlugins(int Type);
 
 #endif

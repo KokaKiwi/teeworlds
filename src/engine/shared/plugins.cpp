@@ -8,6 +8,8 @@
 #include <engine/plugins.h>
 #include <engine/console.h>
 
+#include <engine/shared/config.h>
+
 #include "plugins.h"
 
 CPlugin::CPlugin(const char *pPath)
@@ -45,7 +47,12 @@ const char *CPlugin::ErrorString()
 	return m_pError;
 }
 
-IPlugin *CPlugins::LoadPlugin(const char *pPath, int Type)
+CPlugins::CPlugins(int Type)
+{
+	m_pType = Type;
+}
+
+IPlugin *CPlugins::LoadPlugin(const char *pPath)
 {
 	CPlugin *pPlugin = new CPlugin(pPath);
 
@@ -65,7 +72,7 @@ IPlugin *CPlugins::LoadPlugin(const char *pPath, int Type)
 		return 0;
 	}
 
-	if (!(pPlugin->m_PluginInfo.m_Type & Type))
+	if (!(pPlugin->m_PluginInfo.m_Type & m_pType))
 	{
 		dbg_msg("plugins", "error: mismatching plugin type: %s", pPath);
 		delete pPlugin;
@@ -112,12 +119,20 @@ void CPlugins::UnloadPlugins()
 	}
 }
 
-void CPlugins::Init()
+void CPlugins::Con_LoadPlugin(IConsole::IResult *pResult, void *pUserData)
 {
-
+	IPlugins *pSelf = (IPlugins *)pUserData;
+	pSelf->LoadPlugin(pResult->GetString(0));
 }
 
-IPlugins *CreatePlugins()
+void CPlugins::Init()
 {
-	return new CPlugins();
+	IConsole *pConsole = Kernel()->RequestInterface<IConsole>();
+
+	pConsole->Register("loadplugin", "s", CFGFLAG_CLIENT|CFGFLAG_SERVER, Con_LoadPlugin, this, "Load plugin");
+}
+
+IPlugins *CreatePlugins(int Type)
+{
+	return new CPlugins(Type);
 }
