@@ -271,7 +271,7 @@ function build(settings)
 	plugins = {}
 	for i,v in ipairs(plugins_dir) do
 		pluginname = PathFilename(PathBase(v))
-		plugin_src = CollectRecursive(v .. "/*")
+		plugin_src = CollectRecursive(v .. "/*.c", v .. "/*.cpp")
 		pluginfile = "plugins/" .. pluginname .. ".so"
 		plugins[i] = SharedLibrary(plugins_settings, pluginfile, Compile(plugins_settings, plugin_src))
 	end
