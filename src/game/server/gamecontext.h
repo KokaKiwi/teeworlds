@@ -3,6 +3,8 @@
 #ifndef GAME_SERVER_GAMECONTEXT_H
 #define GAME_SERVER_GAMECONTEXT_H
 
+#include <base/tl/array.h>
+
 #include <engine/console.h>
 #include <engine/server.h>
 
@@ -41,6 +43,15 @@ class CGameContext : public IGameServer
 	CCollision m_Collision;
 	CNetObjHandler m_NetObjHandler;
 	CTuningParams m_Tuning;
+
+	struct CControllerInfo
+	{
+		const char *m_Name;
+		IGameController *m_Controller;
+
+		CControllerInfo(const char *pName, IGameController *pController): m_Name(pName), m_Controller(pController) {}
+	};
+	array<CControllerInfo *> m_pControllers;
 
 	static void ConTuneParam(IConsole::IResult *pResult, void *pUserData);
 	static void ConTuneReset(IConsole::IResult *pResult, void *pUserData);
@@ -178,6 +189,8 @@ public:
 
 	virtual bool IsClientReady(int ClientID);
 	virtual bool IsClientPlayer(int ClientID);
+
+	virtual void RegisterController(const char *pName, IGameController *pController);
 
 	virtual const char *GameType();
 	virtual const char *Version();

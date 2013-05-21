@@ -5,6 +5,8 @@
 #include "kernel.h"
 #include "message.h"
 
+#include <game/server/gamecontroller.h>
+
 class IServer : public IInterface
 {
 	MACRO_INTERFACE("server", 0)
@@ -93,6 +95,8 @@ public:
 
 	virtual bool IsClientReady(int ClientID) = 0;
 	virtual bool IsClientPlayer(int ClientID) = 0;
+
+	virtual void RegisterController(const char *pName, IGameController *pController) = 0;
 
 	virtual const char *GameType() = 0;
 	virtual const char *Version() = 0;

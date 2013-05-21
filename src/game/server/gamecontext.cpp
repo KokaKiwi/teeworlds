@@ -1368,7 +1368,20 @@ void CGameContext::OnInit()
 	else if(str_comp_nocase(g_Config.m_SvGametype, "tdm") == 0)
 		m_pController = new CGameControllerTDM(this);
 	else
-		m_pController = new CGameControllerDM(this);
+	{
+		int i;
+		for (i = 0; i < m_pControllers.size(); i++)
+		{
+			CControllerInfo *pControllerInfo = m_pControllers[i];
+			if (str_comp_nocase(g_Config.m_SvGametype, pControllerInfo->m_Name) == 0)
+			{
+				m_pController = pControllerInfo->m_Controller;
+				break;
+			}
+		}
+		if (i == m_pControllers.size())
+			m_pController = new CGameControllerDM(this);
+	}
 
 	// create all entities from the game layer
 	CMapItemLayerTilemap *pTileMap = m_Layers.GameLayer();
@@ -1441,6 +1454,11 @@ bool CGameContext::IsClientReady(int ClientID)
 bool CGameContext::IsClientPlayer(int ClientID)
 {
 	return m_apPlayers[ClientID] && m_apPlayers[ClientID]->GetTeam() == TEAM_SPECTATORS ? false : true;
+}
+
+void CGameContext::RegisterController(const char *pName, IGameController *pController)
+{
+	m_pControllers.add(new CControllerInfo(pName, pController));
 }
 
 const char *CGameContext::GameType() { return m_pController && m_pController->GetGameType() ? m_pController->GetGameType() : ""; }
